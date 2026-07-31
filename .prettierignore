@@ -1,0 +1,19 @@
+# Node
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build and coverage
+build/
+dist/
+coverage/
+
+# Prisma Generated Client
+lib/generated/prisma/
+
+# Misc
+.env
+.env.*
+*.log
