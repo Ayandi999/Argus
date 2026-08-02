@@ -5,6 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useFormStatus } from 'react-dom';
 import { signinWithGithub } from '../actions/auth';
 
+// this is just the github icon svg
 export function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
