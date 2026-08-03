@@ -6,8 +6,10 @@ import {
   LayoutIcon ,
   GitBranch,
   GithubLogo,
-  Gear,
+  Gear
 } from "@phosphor-icons/react";
+
+import { BookPlus } from 'lucide-react'
 
 import {
   DASHBOARD_NAV_ITEMS,
@@ -25,8 +27,9 @@ import {
 const NAV_ICONS = {
   "layout-dashboard": LayoutIcon ,
   "folder-git-2": GitBranch,
-  github: GithubLogo,
-  settings: Gear,
+  "github": GithubLogo,
+ "settings": Gear,
+ "book-plus": BookPlus
 } as const;
 
 function isNavActive(pathname: string, href: DashboardRoute) {
