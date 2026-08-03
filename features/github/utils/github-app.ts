@@ -7,7 +7,7 @@ export function getGithubApp(){
     if(!githubApp){
         githubApp = new App({
             appId : process.env.GITHUB_APP_ID!,
-            privateKey : process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g,"\n"),
+            privateKey : process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g,"\n").replace(/"/g, "").trim(),
             webhooks : {
                 secret : process.env.GITHUB_WEB_HOOK_SECRET!
             }
