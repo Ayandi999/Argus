@@ -79,6 +79,22 @@ export async function saveInstallation(userId: string, installationId: number) {
 export async function deleteInstallation(userId: string) {
   //I need access to github app as well to delete from github
   // app.octokit.rest.apps.deleteInstallation({intallationId})
+  const appData = await prisma.githubInstallation.findFirst({
+    where: { userId },
+    select: { installationId: true },
+  });
+  if (appData?.installationId) {
+    try {
+      const app = getGithubApp();
+
+      await app.octokit.rest.apps.deleteInstallation({
+        installation_id: appData.installationId,
+      });
+      console.log('gituhub app was successfully removed.');
+    } catch (e) {
+      console.log('Failed to remove the github app.');
+    }
+  }
   await prisma.githubInstallation.delete({ where: { userId } });
 }
 
