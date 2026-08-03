@@ -12,10 +12,11 @@ import {
 export async function signinWithGithub(formData: FormData) {
   const callback = formData.get('callbackUrl');
   const redirectTo = getSafeCallbackPath(typeof callback === 'string' ? callback : null)
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
   const result = await auth.api.signInSocial({
     body: {
       provider: 'github',
-      callbackURL: redirectTo, //this was '/dashboard' as a place holder
+      callbackURL: `${baseUrl}${redirectTo}`,
     },
     headers: await headers(),
   });

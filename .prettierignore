@@ -15,5 +15,5 @@ lib/generated/prisma/
 
 # Misc
 .env
-.env.*
+.env*
 *.log
