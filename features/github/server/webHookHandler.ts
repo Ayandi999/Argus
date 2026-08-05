@@ -58,7 +58,7 @@ export async function handleGithubWebHook(request: Request) {
 
   const pullRequest = await savePullRequest(event);
 
-  //This was added by AI need to review this before final draft
+  //Calling inngest function
   await inngest.send({
     name: 'github/pr.recived',
     data: {
