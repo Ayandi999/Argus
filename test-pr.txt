@@ -2,4 +2,6 @@ This is just a joke file no need to pay any attention here
 Some more words will be put here for no reason please check this shit out
 I know this sounds like a joke but trust me man it's a testing PR nothing more
 
-comeon accept my PR plssssss
+comeon accept my PR plssss
+
+another commit to test if inngest and app are orknig as planned
