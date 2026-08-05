@@ -38,7 +38,14 @@ export async function handleGithubWebHook(request: Request) {
 
   const payload = await request.text();
   const signature = request.headers.get('x-hub-signature-256');
-  const eventName = request.headers.get('x-hub-event');
+  const eventName = request.headers.get('x-github-event');
+
+  // let action = 'unknown';
+  // try {
+  //   action = JSON.parse(payload).action;
+  // } catch (e) {}
+
+  // console.log(`\n\n[WEBHOOK RECEIVED] Event: ${eventName} | Action: ${action} | [PAYLOAD]: ${payload}\n`);
 
   const isValid = await isSignatureValid({ payload, signature });
 
@@ -57,6 +64,8 @@ export async function handleGithubWebHook(request: Request) {
     return Response.json({ recived: true });
 
   const pullRequest = await savePullRequest(event);
+  
+    console.log(`EVENT : ${event} , EVENT_ACTION : ${event.action}`);
 
   //Calling inngest function
   await inngest.send({
