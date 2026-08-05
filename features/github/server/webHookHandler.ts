@@ -1,7 +1,8 @@
 //verifying if this update was ment for me or not
 
 import { getGithubApp } from '../utils/github-app';
-import {savePullRequest} from '@/features/reviews/server/save-pll-request'
+import { savePullRequest } from '@/features/reviews/server/save-pll-request';
+import { inngest } from '@/features/inngest/client';
 
 //Basically we chenck if it's sent using the webhook secret we added or not
 async function isSignatureValid({
@@ -56,4 +57,14 @@ export async function handleGithubWebHook(request: Request) {
     return Response.json({ recived: true });
 
   const pullRequest = await savePullRequest(event);
+
+  //Calling inngest function
+  await inngest.send({
+    name: 'github/pr.recived',
+    data: {
+      pullRequestId: pullRequest.id,
+    },
+  });
+
+  return Response.json({ success: true });
 }
