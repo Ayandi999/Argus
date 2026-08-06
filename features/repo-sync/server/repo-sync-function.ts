@@ -69,3 +69,5 @@ export const syncRepoCodebaseFunction = inngest.createFunction(
     };
   }
 );
+
+export { buildRepoNamespace };

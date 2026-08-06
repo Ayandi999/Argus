@@ -46,6 +46,8 @@ Then use this structure if there are findings:
 type ReviewInput = {
   repoFullName: string;
   title: string;
+  contextSnippets: string[];
+  repoContextSnippets: string[];
 };
 
 //This is for the
@@ -59,11 +61,17 @@ function buildRepoContextSection(repoContextSnippets: string[]) {
 }
 
 export async function generateReview(input: ReviewInput) {
+  const context = input.contextSnippets.join('\n\n---\n\n');
+  const reviewContextSnippets = buildRepoContextSection(
+    input.repoContextSnippets
+  );
   const { text } = await generateText({
     model: openrouter(REVIEW_MODEL),
     system: SYSTEM_PROMPT,
-    prompt: `Repository: ${input.repoFullName} Pull request title : ${input.title}`,
+    prompt: `
+      Repository: ${input.repoFullName} 
+      Pull request title : ${input.title}
+      Code Changes : ${context},${reviewContextSnippets}`,
   });
   return text;
 }
-
