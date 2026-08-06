@@ -1,5 +1,5 @@
 import { getServerSession } from '@/features/auth/actions/auth';
-import { getUserIdByInstallationId } from '@/features/github/server/installation';
+import { getUserInstallationId } from '@/features/github/server/installation';
 import { getInstallationReposPage } from '@/features/github/server/repos';
 import { getRepoSyncStatuses } from '@/features/repo-sync/server/rerpo-sync';
 import { NextResponse } from 'next/server';
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (!session)
     return NextResponse.json({ error: 'unauthorized access' }, { status: 401 });
 
-  const installationId = getUserIdByInstallationId(Number(session.user.id));
+  const installationId = await getUserInstallationId(session.user.id);
 
   if (!installationId)
     return NextResponse.json(

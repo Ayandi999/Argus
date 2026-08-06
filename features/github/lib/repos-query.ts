@@ -16,9 +16,12 @@ export const githubRepoKeys = {
 const REPOS_STALE_TIME = 10 * 60 * 1000;
 
 export const githubReposInfiniteQuery = infiniteQueryOptions({
+  
   queryKey: [...githubRepoKeys.all, 'list'],
   queryFn: async ({ pageParam }) => {
-    const response = await fetch(`/api/github/repos?page=${pageParam}`);
+    console.log(`Fetching from /api/github/repo?page=${pageParam}...`);
+    const response = await fetch(`/api/github/repo?page=${pageParam}`);
+    console.log(`Fetch response status:`, response.status);
 
     if (!response.ok) throw new Error('Failed to load repo');
 
