@@ -7,3 +7,5 @@ comeon accept my PR plssss
 another commit to test if inngest and app are orknig as planned
 
 green push
+
+Just wanted to push a code that's all
