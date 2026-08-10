@@ -3,6 +3,9 @@
 import { getGithubApp } from '../utils/github-app';
 import { savePullRequest } from '@/features/reviews/server/save-pll-request';
 import { inngest } from '@/features/inngest/client';
+import { getUserIdByInstallationId } from './installation';
+import { canUserReview } from '@/features/billing/server/usage';
+import { prisma } from '@/lib/db';
 
 //Basically we chenck if it's sent using the webhook secret we added or not
 async function isSignatureValid({
@@ -64,8 +67,18 @@ export async function handleGithubWebHook(request: Request) {
     return Response.json({ recived: true });
 
   const pullRequest = await savePullRequest(event);
-  
-    console.log(`EVENT : ${event} , EVENT_ACTION : ${event.action}`);
+
+  //This is pro subscription guarrail code
+  const userId = await getUserIdByInstallationId(event.installation.id);
+  if (userId) {
+    const allowed = await canUserReview(userId);
+    if (!allowed)
+      await prisma.pullRequest.update({
+        where: { id: pullRequest.id },
+        data: { status: 'rate_limited' },
+      });
+    return Response.json({ recived: true, rateLimited: true });
+  }
 
   //Calling inngest function
   await inngest.send({
