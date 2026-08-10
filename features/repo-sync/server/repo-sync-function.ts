@@ -22,6 +22,7 @@ export const syncRepoCodebaseFunction = inngest.createFunction(
   async ({ event, step }) => {
     const repoSyncId = event.data.repoSyncId;
 
+    //update files status to synginc in db
     const repoSync = await step.run('mark-syncing', async () => {
       return prisma.repoSync.update({
         where: { id: repoSyncId },
@@ -38,7 +39,7 @@ export const syncRepoCodebaseFunction = inngest.createFunction(
 
       return chunkRepoFiles(files);
     });
-    
+
     const namespace = buildRepoNamespace(repoSync.repoFullName);
 
     if (repoSync.syncedAt) {

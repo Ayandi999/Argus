@@ -57,6 +57,7 @@ type TreeEntry = {
 
 //making name space question is IDK what this one does
 export function buildRepoNamespace(repoFullName: string) {
+  // facebook/react -> facebook--react--codebase [To index it for retrival]
   return `${repoFullName.replace('/', '--')}--codebase`;
 }
 
@@ -72,10 +73,12 @@ function isSkippedPath(path: string) {
 
 //is this file indexable should i make vector embeddings based on size
 function isIndexableFile(entry: TreeEntry) {
+  //blob mean file and tree mean folder we just want files
   if (entry.type !== 'blob' || !entry.path || !entry.sha) {
     return false;
   }
 
+  //Is this too big to index
   if (entry.size && entry.size > MAX_FILE_SIZE_BYTES) {
     return false;
   }
@@ -87,7 +90,7 @@ function isIndexableFile(entry: TreeEntry) {
   return hasCodeExtension(entry.path);
 }
 
-//Generated a chunk id
+//Generated a chunk id[helper function]
 function buildChunkId(filePath: string, part: number) {
   return `repo--${filePath}--part-${part}`;
 }
@@ -99,8 +102,8 @@ export function chunkRepoFiles(files: RepoFile[]): CodeChunk[] {
     const lines = file.content.split('\n');
 
     for (let start = 0; start < lines.length; start += MAX_CHUNK_LINES) {
-      const part = start / MAX_CHUNK_LINES;
-      const text = lines.slice(start, start + MAX_CHUNK_LINES).join('\n');
+      const part = start / MAX_CHUNK_LINES; //calculating part number
+      const text = lines.slice(start, start + MAX_CHUNK_LINES).join('\n'); //Select the 80 lines then put them together with \n
 
       chunks.push({
         id: buildChunkId(file.filePath, part),
@@ -122,14 +125,18 @@ export async function getRepoFiles(
   const octokit = await app.getInstallationOctokit(installationId);
   const [owner, repo] = repoFullName.split('/');
 
+  //Getting file name from github and revurssive 1 mean go inside every folder and give me evry file name
   const { data: tree } = await octokit.request(
     'GET /repos/{owner}/{repo}/git/trees/{tree_sha}',
     { owner, repo, tree_sha: branch, recursive: '1' }
   );
 
+  //Is this a files i want to index also we ensure we are not overloaidn our pinecoe so we did the slice thing only read the first 200 files no matter how many files there are
   const entries = tree.tree.filter(isIndexableFile).slice(0, MAX_FILES);
+
   const files: RepoFile[] = [];
 
+  //Loop through the files and download there content by making a request to the hub
   for (const entry of entries) {
     const { data: blob } = await octokit.request(
       'GET /repos/{owner}/{repo}/git/blobs/{file_sha}',
@@ -149,7 +156,7 @@ export async function deleteRepoNamespace(namespace: string) {
 }
 
 export async function saveRepoChunks(namespace: string, chunks: CodeChunk[]) {
-  const index = getPineconeIndex();
+  const index = getPineconeIndex(); //this is just the variable to access pinecone
 
   for (let start = 0; start < chunks.length; start += UPSERT_BATCH_SIZE) {
     const batch = chunks.slice(start, start + UPSERT_BATCH_SIZE);
@@ -160,10 +167,12 @@ export async function saveRepoChunks(namespace: string, chunks: CodeChunk[]) {
       filePath: chunk.filePath,
     }));
 
+    //We don't need to send the records to open ai anymore to get embeddings pinecone on upserting generates the vector embeddings on it own
     await index.namespace(namespace).upsertRecords({ records });
   }
 }
 
+//frontend rendering function
 export async function getRepoSyncStatuses(repoFullNames: string[]) {
   const syncs = await prisma.repoSync.findMany({
     where: { repoFullName: { in: repoFullNames } },
