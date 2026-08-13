@@ -20,12 +20,12 @@ export async function getUserSubscription(
 
   const renewsAt = user.subscriptionRenewsAt?.toISOString() ?? null;
 
-  if (user.plan !== 'pro') {
-    return { plan: 'free', status: 'active', renewsAt };
-  }
-
   if (user.subscriptionStatus === 'pending') {
     return { plan: 'free', status: 'trialing', renewsAt };
+  }
+
+  if (user.plan !== 'pro') {
+    return { plan: 'free', status: 'active', renewsAt };
   }
 
   if (user.subscriptionStatus === 'canceled') {

@@ -18,6 +18,7 @@ type RazorpayWebhookBody = {
 };
 
 const HANDLED_EVENTS = new Set([
+  'subscription.authenticated',
   'subscription.activated',
   'subscription.charged',
   'subscription.cancelled',
@@ -78,22 +79,20 @@ export async function POST(request: Request) {
     ? new Date(subscription.current_end * 1000)
     : null;
 
-  if (event.event === 'subscription.activated') {
+  if (
+    event.event === 'subscription.authenticated' ||
+    event.event === 'subscription.activated' ||
+    event.event === 'subscription.charged'
+  ) {
+    console.log(subscription.id); //test code
     await prisma.user.update({
       where: { id: userId },
       data: {
         plan: 'pro',
         razorpaySubscriptionId: subscription.id,
         subscriptionStatus: 'active',
-        subscriptionRenewsAt: renewsAt,
+        ...(renewsAt && { subscriptionRenewsAt: renewsAt }),
       },
-    });
-  }
-
-  if (event.event === 'subscription.charged') {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { subscriptionRenewsAt: renewsAt },
     });
   }
 
