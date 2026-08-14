@@ -72,17 +72,18 @@ export async function handleGithubWebHook(request: Request) {
   const userId = await getUserIdByInstallationId(event.installation.id);
   if (userId) {
     const allowed = await canUserReview(userId);
-    if (!allowed)
+    if (!allowed) {
       await prisma.pullRequest.update({
         where: { id: pullRequest.id },
         data: { status: 'rate_limited' },
       });
-    return Response.json({ recived: true, rateLimited: true });
+      return Response.json({ recived: true, rateLimited: true });
+    }
   }
 
   //Calling inngest function
   await inngest.send({
-    name: 'github/pr.recived',
+    name: 'github/pr.received',
     data: {
       pullRequestId: pullRequest.id,
     },
