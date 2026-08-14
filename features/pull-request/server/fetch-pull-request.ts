@@ -29,6 +29,10 @@ export async function getAllPullrequests(installationId: number) {
 
 //this is a function which helps to revaluate PR if for some reason agent falied to do so.
 export async function reevaluatePr(pullrequestid: string) {
+  if (!pullrequestid) {
+    throw new Error("Pull request ID is required");
+  }
+
   await inngest.send({
     name: 'github/pr.received',
     data: {

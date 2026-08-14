@@ -105,6 +105,8 @@ export function chunkRepoFiles(files: RepoFile[]): CodeChunk[] {
       const part = start / MAX_CHUNK_LINES; //calculating part number
       const text = lines.slice(start, start + MAX_CHUNK_LINES).join('\n'); //Select the 80 lines then put them together with \n
 
+      if (text.trim().length === 0) continue;
+
       chunks.push({
         id: buildChunkId(file.filePath, part),
         filePath: file.filePath,
