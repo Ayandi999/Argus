@@ -1,5 +1,6 @@
 'use client';
 
+import { reevaluatePr } from '@/features/pull-request/server/fetch-pull-request';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,7 +21,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { statusBadge } from '@/features/dashboard/lib/status-style';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function PullRequestTable({ pullRequests }: { pullRequests: any[] }) {
@@ -81,17 +82,31 @@ export function PullRequestTable({ pullRequests }: { pullRequests: any[] }) {
                 <TableCell>{pr.authorLogin || 'Unknown'}</TableCell>
                 <TableCell>{pr.baseBranch}</TableCell>
                 <TableCell>
-                  <span
-                    className={statusBadge(
-                      pr.status === 'reviewed'
-                        ? 'success'
-                        : pr.status === 'pending' || pr.status === 'open'
-                          ? 'info'
-                          : 'neutral'
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={statusBadge(
+                        pr.status === 'reviewed'
+                          ? 'success'
+                          : pr.status === 'pending' || pr.status === 'open'
+                            ? 'info'
+                            : 'neutral'
+                      )}
+                    >
+                      {pr.status}
+                    </span>
+                    {pr.status === 'pending' && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await reevaluatePr(pr.id);
+                        }}
+                        className="inline-flex items-center justify-center rounded-md p-1 hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors"
+                        title="Generate review now"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
                     )}
-                  >
-                    {pr.status}
-                  </span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   {pr.reviewedAt
