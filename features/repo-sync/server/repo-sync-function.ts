@@ -26,7 +26,7 @@ export const syncRepoCodebaseFunction = inngest.createFunction(
     const repoSync = await step.run('mark-syncing', async () => {
       return prisma.repoSync.update({
         where: { id: repoSyncId },
-        data: { status: 'syncing' },
+        data: { status: 'fetching' },
       });
     });
 
@@ -38,6 +38,13 @@ export const syncRepoCodebaseFunction = inngest.createFunction(
       );
 
       return chunkRepoFiles(files);
+    });
+
+    await step.run('mark-saving', async () => {
+      return prisma.repoSync.update({
+        where: { id: repoSyncId },
+        data: { status: 'memorizing' },
+      });
     });
 
     const namespace = buildRepoNamespace(repoSync.repoFullName);

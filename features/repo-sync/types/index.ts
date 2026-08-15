@@ -3,4 +3,4 @@ export type RepoFile = {
   content: string;
 };
 
-export type RepoSyncStatus = 'pending' | 'syncing' | 'synced' | 'failed';
+export type RepoSyncStatus = 'pending' | 'syncing' | 'synced' | 'failed' | 'fetching' | 'memorizing';
