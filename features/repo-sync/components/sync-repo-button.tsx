@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { githubRepoKeys } from '@/features/github/lib/repos-query';
 import { syncRepoCodeBase } from '../actions/repo-action';
@@ -10,22 +10,14 @@ import { toast } from 'sonner';
 import { 
   Download, 
   Brain, 
-  RefreshCw, 
-  CheckCircle2 
+  RefreshCw 
 } from 'lucide-react';
-
-const AnimatedDots = () => {
-  const [dots, setDots] = useState('');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? '' : prev + '.'));
-    }, 400); // changes every 400ms
-    return () => clearInterval(interval);
-  }, []);
-
-  return <span className="inline-block w-4 text-left">{dots}</span>;
-};
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type SyncRepoButtonProps = {
   repoFullName: string;
@@ -59,58 +51,61 @@ const SyncRepoButton = ({
   const syncing = isSyncing(syncStatus, syncRepo.isPending);
   const isSynced = syncStatus === 'synced';
 
-  const renderIconAndText = () => {
+  const renderIcon = () => {
     switch (syncStatus) {
       case 'fetching':
-        return (
-          <>
-            <Download className="absolute left-3 h-4 w-4" />
-            Fetching<AnimatedDots />
-          </>
-        );
+        return <Download className="h-4 w-4" />;
       case 'memorizing':
-        return (
-          <>
-            <Brain className="absolute left-3 h-4 w-4 animate-pulse" />
-            Memorizing<AnimatedDots />
-          </>
-        );
+        return <Brain className="h-4 w-4" />;
       case 'synced':
-        return (
-          <>
-            <CheckCircle2 className="absolute left-3 h-4 w-4 text-green-500" />
-            Re-sync
-          </>
-        );
+        return <RefreshCw className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180 text-green-500" />;
       default:
         if (syncing) {
-          return (
-            <>
-              <RefreshCw className="absolute left-3 h-4 w-4 animate-spin text-muted-foreground" />
-              Syncing<AnimatedDots />
-            </>
-          );
+          return <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />;
         }
-        return (
-          <>
-            <RefreshCw className="absolute left-3 h-4 w-4" />
-            Sync
-          </>
-        );
+        return <RefreshCw className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180" />;
+    }
+  };
+
+  const getTooltipText = () => {
+    switch (syncStatus) {
+      case 'fetching':
+        return 'Fetching...';
+      case 'memorizing':
+        return 'Memorizing...';
+      case 'synced':
+        return 'Re-sync';
+      default:
+        if (syncing) {
+          return 'Syncing...';
+        }
+        return 'Sync';
     }
   };
 
   return (
-    <Button
-      size="sm"
-      variant={isSynced ? "secondary" : "outline"}
-      disabled={syncing}
-      onClick={() => syncRepo.mutate()}
-      className="w-[155px] relative transition-all duration-300"
-    >
-      {renderIconAndText()}
-    </Button>
+    <TooltipProvider delay={0}>
+      <Tooltip>
+        <TooltipTrigger render={
+          <span className="inline-block">
+            <Button
+              size="icon"
+              variant={isSynced ? "secondary" : "outline"}
+              disabled={syncing}
+              onClick={() => syncRepo.mutate()}
+              className="group relative transition-all duration-300"
+            >
+              {renderIcon()}
+            </Button>
+          </span>
+        } />
+        <TooltipContent>
+          <p>{getTooltipText()}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
 export default SyncRepoButton;
+
