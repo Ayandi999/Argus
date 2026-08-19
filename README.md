@@ -140,7 +140,7 @@ That's it, the project is live! A few final things to keep in mind to ensure eve
 - You can watch the output of the reviews happening in real-time inside the **Inngest** dashboard (`http://localhost:8288`).
 - If you are syncing any repositories to Pinecone, the syncing progress and UI can also be monitored directly from the Inngest local server.
 
-Have fun building and reviewing! 🚀
+Have fun building and reviewing! 
 
 ---
 
