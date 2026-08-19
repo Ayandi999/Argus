@@ -135,7 +135,7 @@ With all three terminals running, you're officially ready to go!
 ### 🎉 Enjoy the Project!
 
 That's it, the project is live! A few final things to keep in mind to ensure everything runs smoothly:
-- **Crucial Step**: Making an account on your local instance and installing the GitHub Agent you created earlier is an absolute **MUST**. The app will not function without it!
+- **Crucial Step**: Making an account on your local instances and installing the GitHub Agent you created earlier is an absolute **MUST**. The app will not function without it!
 - Once all the services are up and running, and the app is connected, you can start reviewing PRs seamlessly.
 - You can watch the output of the reviews happening in real-time inside the **Inngest** dashboard (`http://localhost:8288`).
 - If you are syncing any repositories to Pinecone, the syncing progress and UI can also be monitored directly from the Inngest local server.
